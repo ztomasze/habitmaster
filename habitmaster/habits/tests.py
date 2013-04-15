@@ -3,7 +3,7 @@ Tests habit-related classes.  Use "manage.py test" to run.
 """
 
 from django.test import TestCase
-from habitmaster.habits.models import DaysOfWeekSchedule
+from habitmaster.habits.models import DaysOfWeekSchedule, IntervalSchedule
 from django.core.validators import ValidationError
 
 class DaysOfWeekScheduleTest(TestCase):
@@ -29,5 +29,18 @@ class DaysOfWeekScheduleTest(TestCase):
         self.assertEqual(self.weekend.__unicode__(), 'Sa/Su')
 
 
-class IntervalSchedule(TestCase):
-    pass
+class IntervalScheduleTest(TestCase):
+    def setUp(self):
+        self.every3 = IntervalSchedule.objects.create(interval=3)
+
+    def test_badSetUp(self):
+        with self.assertRaises(ValidationError):
+            obj = IntervalSchedule.objects.create(interval=0)
+            obj.clean_fields()
+        with self.assertRaises(ValidationError):
+            obj = IntervalSchedule.objects.create(interval=8)
+            obj.clean_fields()    
+
+    def test_unicode(self):
+        self.assertEqual(self.every3.__unicode__(), 'Once every 3 days')
+        

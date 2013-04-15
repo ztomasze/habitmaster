@@ -14,10 +14,13 @@ class DaysOfWeekSchedule(Schedule):
     """
     DAYS_OF_WEEK = ('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su')
     
-    days = models.CharField(max_length=7, validators=[RegexValidator(r'[01]{7}', "Value must be seven 0s or 1s")])
+    days = models.CharField(max_length=7, 
+            validators=[RegexValidator(r'[01]{7}', "Value must be seven 0s or 1s")])
 
     def asNames(self):
-        """ Returns the required days of this schedule as a list of 2-char method names. """
+        """ 
+        Returns the required days of this schedule as a list of 2-char method names. 
+        """
         names = []
         for (i, day) in enumerate(self.days):
             if (day == '1'):
@@ -28,19 +31,21 @@ class DaysOfWeekSchedule(Schedule):
         return "/".join(self.asNames())
         
     
-class InterervalSchedule(Schedule):
+class IntervalSchedule(Schedule):
     """
     The habit must be exercised at least once every X days, where X is 1 to 7.
     """
     interval = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(7)])
 
     def __unicode__(self):
-        return 'Once every ' + self.interval + ' days'
-        
+        return 'Once every ' + str(self.interval) + ' days'
+
 
         
 class Habit(models.Model):
-    """ The habit to establish, which consists of a task repeated on the given schedule. """
+    """ 
+    The habit to establish, which consists of a task repeated on the given schedule. 
+    """
     user = models.ForeignKey(User)
     task = models.CharField(max_length=200)
     schedule = models.ForeignKey(Schedule)
