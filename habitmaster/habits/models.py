@@ -1,6 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from habitmaster.users.models import User
 
 
 class Schedule(models.Model):
@@ -30,7 +30,7 @@ class DaysOfWeekSchedule(Schedule):
     def __unicode__(self):
         return "/".join(self.asNames())
         
-    
+
 class IntervalSchedule(Schedule):
     """
     The habit must be exercised at least once every X days, where X is 1 to 7.
