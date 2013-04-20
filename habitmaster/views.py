@@ -1,5 +1,5 @@
 """
-Top-level pages, such as user login.
+Top-level pages, such as main page.
 """
 
 from django.shortcuts import render

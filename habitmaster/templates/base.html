@@ -1,0 +1,22 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'global.css' %}" />
+
+    <!--[if lt IE 9]>
+    <script src="static/html5shiv.js"></script>
+    <![endif]-->
+    
+    <title>{% block title %}HabitMaster{% endblock %}{% block subtitle %}{% endblock subtitle %}</title>
+</head>
+
+<body>
+    
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+    
+</body>
+</html>

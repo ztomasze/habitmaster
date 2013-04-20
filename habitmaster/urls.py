@@ -4,11 +4,15 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
+# All habitmaster URLs are current here, rather than divided up into app-specific sets.
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'habitmaster.views.home', name='home'),
     # url(r'^habitmaster/', include('habitmaster.foo.urls')),
     url(r'^$', 'habitmaster.views.index'),
+
+    url(r'^user/new$', 'habitmaster.users.views.create'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
