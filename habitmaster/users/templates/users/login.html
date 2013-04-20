@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - Login{% endblock %}
+
+{% block content %}
+
+<div id="users_login">
+<h2>Login</h2>
+{% if login_error %}<p class="error">{{ login_error }}</p>{% endif %}
+
+<form action="{% url 'login' %}" method="post">
+{% csrf_token %}
+<p><label> Username: <input name="username" type="text"></label>
+<p><label> Password: <input name="password" type="password"></label>
+<p><input type="submit" value="Login" />
+</form>
+</div>
+
+<div id="users_create">
+<h2>Create an Account</h2>
+{% if create_error %}<p class="error">{{ create_error }}</p>{% endif %}
+
+<form action="{% url 'create' %}" method="post">
+{% csrf_token %}
+<p><label> Username: <input name="username" type="text"></label>
+<p><label> Password: <input name="password" type="password"></label>
+<p><label> Retype Password: <input name="password_again" type="password"></label>
+<p><label> Email: <input name="email" type="email"></label>
+<p><input type="submit" value="Create" />
+</form>
+</div>
+
+{% endblock %}

@@ -10,10 +10,12 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'habitmaster.views.home', name='home'),
     # url(r'^habitmaster/', include('habitmaster.foo.urls')),
-    url(r'^$', 'habitmaster.views.index'),
+    url(r'^$', 'habitmaster.views.index', name='index'),
 
-    url(r'^user/new$', 'habitmaster.users.views.create'),
-
+    url(r'^create/$', 'habitmaster.users.views.create', name='create'),
+    url(r'^login/$', 'habitmaster.users.views.login', name='login'),
+    url(r'^logout/$', 'habitmaster.users.views.logout', name='logout'),
+    
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

@@ -5,3 +5,8 @@
 BODY {
     font-family: sans-serif;
 }
+
+.error {
+    border: 2px solid red;
+    padding: 0.2em;
+}

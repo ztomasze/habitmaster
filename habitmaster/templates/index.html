@@ -3,6 +3,9 @@
 {% block content %}
 
 <p>
-Main page content will go here....
+Welcome, {{ request.user }}!  (<a href="/logout/">logout</a>)
+
+<p>
+Main habit overview content will go here...
 
 {% endblock %}
