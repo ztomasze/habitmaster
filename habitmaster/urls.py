@@ -10,8 +10,10 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'habitmaster.views.home', name='home'),
     # url(r'^habitmaster/', include('habitmaster.foo.urls')),
-    url(r'^$', 'habitmaster.views.index', name='index'),
+    url(r'^$', 'habitmaster.habits.views.index', name='index'),
 
+    url(r'^habit/new/$', 'habitmaster.habits.views.create', name='habits_create'),
+    
     url(r'^create/$', 'habitmaster.users.views.create', name='create'),
     url(r'^login/$', 'habitmaster.users.views.login', name='login'),
     url(r'^logout/$', 'habitmaster.users.views.logout', name='logout'),

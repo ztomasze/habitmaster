@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - New habit{% endblock %}
+{% block content %}
+
+<div class="row">
+<form action="{% url 'habits_create' %}" method="post" class="offset1 span10 habit">
+<fieldset>
+<legend>New Habit</legend>
+<div class="line">
+    <label>Task To Do</label>
+    <input type="text" name="task" class="input-block-level"
+        placeholder="What is it that you want to do (or not do)?">
+</div>
+<div class="line">
+    <label>Task Frequency</label>
+    <table id="new_habit">
+    <tr><td class="selector"><td class="description">
+        <td class="day">Mo
+        <td class="day">Tu
+        <td class="day">We
+        <td class="day">Th
+        <td class="day">Fr
+        <td class="day">Sa
+        <td class="day">Su
+    <tr><td><input type="radio" name="schedule" value="days"> 
+        <td class="description">On specific days:
+        <td><input type="checkbox" name="Mo" value="on">
+        <td><input type="checkbox" name="Tu">
+        <td><input type="checkbox" name="We">
+        <td><input type="checkbox" name="Th">
+        <td><input type="checkbox" name="Fr" value="on">
+        <td><input type="checkbox" name="Sa">
+        <td><input type="checkbox" name="Su">
+    <tr>
+        <td><input type="radio" name="schedule" value="fixed"> 
+        <td class="description">Once every 
+        <td colspan="7">X days
+    </table>
+<div class="line">
+    <button type="submit" class="btn btn-primary">Create</button>
+</div>
+</div> 
+</fieldset>
+</form>
+</div>
+
+<!--
+<table class="form">
+<tr>
+    <th>Task To Do
+    <td><input type="text" name="task">
+</tr>
+<tr>
+    <th rowspan="2">Task Frequency
+    <td>
+        <input type="radio" name="schedule" value="days">On specific days:
+    <td>    
+        <input type="checkbox" name="Mo" value="on">
+        <input type="checkbox" name="Tu">
+        <input type="checkbox" name="We">
+        <input type="checkbox" name="Th">
+        <input type="checkbox" name="Fr" value="on">
+        <input type="checkbox" name="Sa">
+        <input type="checkbox" name="Su">
+</tr>
+<tr>
+    <td>
+        <input type="radio" name="schedule" value="fixed">Once every X days
+</tr>
+</table>
+-->
+
+{% endblock %}
