@@ -1,12 +1,45 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
+import datetime
+
+# useful streak-processing functions
+    
+def daysInStreak(self, streak, isCurrent=False):
+    """ 
+    Returns the number of days covered by the activities in this streak.  
+    If isCurrent, this is the number of days from the first activity to today.
+    """
+    pass
+
 
 
 class Schedule(models.Model):
-    pass
+    
+    """
+    The superclass of all Schedules, this class provides a number of useful methods to be
+    inherited. Some of the methods are "abstract" and are described here so that subclasses
+    know what they must override.
+    
+    For all methods, a streak is a list of activities that form a valid streak for this
+    schedule.  Thus, a list of streaks is a list of lists of activities.  See getStreaks
+    method for more.
+    """    
+    def getStreaks(self, activities):
+        """ 
+        Given a flat list of activities, returns a list of lists of those activities where
+        each sublist is a streak according to this particular schedule.  Activities should
+        be in sorted older-to-newer order.
+        
+        Returned list of streaks always includes the current streak as the last entry, 
+        even if that streak is empty of any actual activities.
+        
+        ABSTRACT: Currently returns an empty list (no streaks at all).  Must be overridden.
+        """
+        return []
 
     
+        
 class DaysOfWeekSchedule(Schedule):
     """
     Represents which specific days of the week the habit should be exercised.
@@ -30,7 +63,23 @@ class DaysOfWeekSchedule(Schedule):
     def __unicode__(self):
         return "/".join(self.asNames())
         
-
+    def nextRequired(self, date, floor=True):
+        """ 
+        Given a date, what is the date of the next required activity?
+        If floor=True, will return the soonest possible date, even if that is the
+        date given.  Otherwise, finds the first requirement after the given date.
+        """
+        pass
+#TODO    
+        
+    def getStreaks(self, activities):
+        streaks = []
+        streak = []
+#TODO:        for act in activities:
+        return streaks
+        
+        
+        
 class IntervalSchedule(Schedule):
     """
     The habit must be exercised at least once every X days, where X is 1 to 7.
@@ -49,6 +98,18 @@ class Habit(models.Model):
     user = models.ForeignKey(User)
     task = models.CharField(max_length=200)
     schedule = models.ForeignKey(Schedule)
+    created = models.DateField(auto_now_add=True)
+    
+    def getActivities(self, missed=False):
+        return Activity.objects.filter(habit=self).order_by('date')
+    
+    def getTotalTimes(self):
+        """ Returns the number of completed activities for this habit. """
+        activities = self.getActivities().exclude(status=Activity.MISSED)
+        return activities.count()
+        
+    def getTotalDays(self):
+        return (datetime.date.today() - self.getActivities()[0].date).days
     
     def __unicode__(self):
         return self.task
@@ -78,7 +139,7 @@ class Activity(models.Model):
     
     habit = models.ForeignKey(Habit)    
     date = models.DateField()
-    status = models.IntegerField(choices=STATUS_LEVELS)
-    note = models.TextField()
+    status = models.IntegerField(choices=STATUS_LEVELS, default=COMPLETED)
+    note = models.TextField(blank=True)
     
     

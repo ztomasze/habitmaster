@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
+{% block subtitle %} - Habits{% endblock %}
 {% block content %}
 
 <p>
-Welcome, {{ request.user }}!  (<a href="/logout/">logout</a>)
+Welcome, {{ user }}!  (<a href="/logout/">logout</a>)
 
 <p>
-Main habit overview content will go here...
+your habits: {{ habits }}
 
 {% endblock %}

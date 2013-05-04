@@ -1,0 +1,16 @@
+
+
+habits.models.IntervalSchedule:
+* Currently like specific days, the activity needs to occur every X days on the dot.
+Would be nice to make this a bit more flexible, so the habit can occur in that range.
+
+
+habits.views.create:
+* This could be refactored to be a bootstrap modal popup, rather than a separate static page.
+
+* Would be nice to keep the filled input fields populated on an error.
+This would require loading the context dict with all existing data and
+restoring it in the webpage template.  (Too much work for right now.)
+
+* Would be good to highlight the new habit in the resulting list when
+forwarding the user back to the list of all habits.

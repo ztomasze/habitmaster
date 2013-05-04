@@ -32,6 +32,7 @@ FORM.login .line LABEL {
     width: 25%;
 }
 
+
 FORM.habit {
    margin-top: 2em;   
 }
@@ -41,14 +42,39 @@ FORM.habit LEGEND {
 FORM.habit LABEL {
     font-weight: bold;   
 }
+
+FORM.habit #new_habit {
+    border: 1px dotted #999;
+}
+
 FORM.habit #new_habit TD {
     width: 2em;
     text-align: center;
     vertical-align: middle;
+    border-top: 1px dotted #999;
+}
+FORM.habit #new_habit TR.top TD {
+    border-top: 0;
 }
 FORM.habit #new_habit TD.description {
     width: 18ex;
     text-align: left;
     padding-left: 1em;
+}
+FORM.habit #new_habit TD.day {
+    vertical-align: bottom;   
+}
+FORM.habit #new_habit TD.checkbox {
+    vertical-align: top;   
+}
+FORM.habit #new_habit TD.selector {
+    border: 1px dotted #999;   
+}
+FORM.habit SELECT {
+    margin: 0.5em 0em;
+    width: auto:
+}
+FORM.habit BUTTON {
+    margin: 1em auto 0.5em;
 }
 
