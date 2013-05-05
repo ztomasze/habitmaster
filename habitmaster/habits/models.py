@@ -5,13 +5,19 @@ import datetime
 
 # useful streak-processing functions
     
-def daysInStreak(self, streak, isCurrent=False):
+def daysInStreak(self, streak, toToday=False):
     """ 
-    Returns the number of days covered by the activities in this streak.  
-    If isCurrent, this is the number of days from the first activity to today.
+    Returns the number of days covered by the activities recorded in this streak.  
+    This is a min of 1 day, unless the streak is empty.
+    
+    If toToday, this is the number of days from the date of the first activity to today.
     """
-    pass
-
+    if not streak:
+        return 0
+    if toToday:
+        return (datetime.date.today() - streak[0].date).days + 1
+    else:
+        return (streak[-1].date - streak[0]).days + 1
 
 
 class Schedule(models.Model):
@@ -25,19 +31,29 @@ class Schedule(models.Model):
     schedule.  Thus, a list of streaks is a list of lists of activities.  See getStreaks
     method for more.
     """    
-    def getStreaks(self, activities):
+    def getStreaks(self, activities, today=None):
         """ 
         Given a flat list of activities, returns a list of lists of those activities where
         each sublist is a streak according to this particular schedule.  Activities should
-        be in sorted older-to-newer order.
+        be in sorted older-to-newer order.  The given date is used as "today" to determine
+        whether the last streak is still ongoing or not.  (If not given, uses today's date.)
         
         Returned list of streaks always includes the current streak as the last entry, 
         even if that streak is empty of any actual activities.
         
-        ABSTRACT: Currently returns an empty list (no streaks at all).  Must be overridden.
+        ABSTRACT: Must be overridden. Currently returns an empty list (no streaks at all).  
         """
         return []
 
+    def nextRequired(self, date, floor=True):
+        """ 
+        Given a date, what is the date of the next required activity?
+        If floor=True, will return the soonest possible date, even if that is the
+        date given.  Otherwise, finds the first requirement after the given date.
+        
+        ABSTRACT: Must be overridden. Currently returns None.
+        """
+        return None
     
         
 class DaysOfWeekSchedule(Schedule):
@@ -63,22 +79,77 @@ class DaysOfWeekSchedule(Schedule):
     def __unicode__(self):
         return "/".join(self.asNames())
         
-    def nextRequired(self, date, floor=True):
-        """ 
-        Given a date, what is the date of the next required activity?
-        If floor=True, will return the soonest possible date, even if that is the
-        date given.  Otherwise, finds the first requirement after the given date.
+
+    def iterFromDate(self, date):
         """
-        pass
-#TODO    
+        Returns a generator (iterator) that returns a continuing series of date
+        objects that correspond to this schedule.  The first date returned will be the
+        given date if it falls on one of the days of this schedule, otherwise it will
+        the first date after that.
+        """
+        class DateIter(object):
+            
+            def __init__(self, days, startDate):
+                self.schedule = days
+
+                # advance to first valid day
+                offset = 0
+                while self.schedule[(startDate.weekday() + offset) % 7] == '0':
+                    offset += 1
+                self.day = startDate + datetime.timedelta(offset)
+
+            def __iter__(self):
+                return self
+                
+            def next(self):
+                current = self.day
+                offset = 1
+                while self.schedule[(self.day.weekday() + offset) % 7] == '0':
+                    offset += 1
+                self.day += datetime.timedelta(offset)
+                return current
+
+        return DateIter(self.days, date)
+    
+    def getStreaks(self, activities, today=None):
+        if not activities:
+            return [[]]  # on current empty streak
+        if not today:
+            today = datetime.date.today()
         
-    def getStreaks(self, activities):
         streaks = []
         streak = []
-#TODO:        for act in activities:
+        reqDays = self.iterFromDate(activities[0].date)
+        i = 0 
+        for req in reqDays:  # infinite loop
+            # usually 0 or 1, but any mismatches before a req
+            while i < len(activities) and activities[i].date < req:
+                streak.append(activities[i])
+                i += 1
+                streaks.append(streak)  # each mismatch produces a new broken streak
+                streak = []
+                
+            if i == len(activities):
+                # all activities processed... 
+                if streak:
+                    streaks.append(streak)
+                # but see if we're still valid
+                if today > req:
+                    streaks.append([])  # now on an empty current streak
+                break
+                
+            if activities[i].date > req:
+                # missed a req day
+                if streak:
+                    streaks.append(streak)
+                    streak = []
+            else:
+                assert activities[i].date == req
+                streak.append(activities[i])
+                i += 1                  
+                
         return streaks
-        
-        
+            
         
 class IntervalSchedule(Schedule):
     """
@@ -89,6 +160,46 @@ class IntervalSchedule(Schedule):
     def __unicode__(self):
         return 'Once every ' + str(self.interval) + ' days'
 
+        
+    def getStreaks(self, activities, today=None):
+        if not activities:
+            return [[]]  # on current empty streak
+        if not today:
+            today = datetime.date.today()
+            
+        streaks = []
+        streak = []
+        startDate = None
+        for act in activities:
+            if not startDate:
+                # starting a new streak
+                startDate = act.date
+                streak.append(act)
+            else:
+                if (act.date - startDate).days % self.interval == 0:
+                    # on the correct day
+                    streak.append(act)
+                else:
+                    if (act.date - startDate).days > self.interval:
+                        # current streak lapsed and this is start of a new one
+                        streaks.append(streak)
+                        streak = [act]
+                        startDate = act.date
+                    else:
+                        # wrong date, but might yet be another on the required day
+                        streak.append(act)
+
+        streaks.append(streak)  #add last streak (may be empty)
+        
+        # see if most recent streak is still an active one
+        if streaks[-1]:
+            lastAct = streaks[-1][-1]
+            if (today - lastAct.date).days > self.interval:
+                # streak lapsed
+                streaks.append([])  # now on an empty current streak
+        
+        return streaks
+        
 
         
 class Habit(models.Model):
@@ -142,4 +253,10 @@ class Activity(models.Model):
     status = models.IntegerField(choices=STATUS_LEVELS, default=COMPLETED)
     note = models.TextField(blank=True)
     
+    def getDate(self):
+        """Returns an ISO-formatted date."""
+        return self.date.isoformat()
+    
+    def __unicode__(self):
+        return self.getDate() + ": " + self.habit.task
     
