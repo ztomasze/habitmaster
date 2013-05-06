@@ -5,6 +5,7 @@ import datetime
 from django.contrib.auth.models import User
 from django.test import TestCase
 from habitmaster.habits.models import DaysOfWeekSchedule, IntervalSchedule, Habit, Activity
+from habitmaster.habits.models import daysInStreak
 from django.core.validators import ValidationError    
 
 class DaysOfWeekScheduleTest(TestCase):
@@ -124,4 +125,13 @@ class HabitTest(TestCase):
         streaks = self.weekdays.getStreaks(activities, today=datetime.date(2013, 5, 27))
         self.assertEqual(7, len(streaks))
         self.assertTrue(streaks[-1])  #non empty list
+
+    def test_getStarLevel(self):
+        Activity.objects.create(habit=self.habitDays, date=datetime.date(2013, 5, 27))
+
+        self.assertEqual(Habit.STAR_LEVELS[0], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 29)))
+        self.habitDays.active = True
+        self.assertEqual(Habit.STAR_LEVELS[1], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 28)))
+        self.assertEqual(Habit.STAR_LEVELS[2], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 29)))
+        self.assertEqual(Habit.STAR_LEVELS[1], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 30)))
         

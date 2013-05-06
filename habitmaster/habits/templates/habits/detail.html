@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - {{ habit.task }}{% endblock %}
+{% block content %}
+
+<div class="row">
+<form class="widget offset1 span10">
+<fieldset>
+<legend>Habit: {{ habit.task }}</legend>
+
+</fieldset>
+</form>
+
+</div>
+
+{% endblock %}

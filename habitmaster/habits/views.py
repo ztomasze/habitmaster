@@ -62,3 +62,26 @@ def create(request):
     # either GET request or an error resulted in POST request
     return render(request, 'habits/create.html', context)
     
+
+@login_required
+def detail(request, habit_id):
+    """
+    Display the detailed view for a single habit.
+    """
+    context = {}
+    try:
+        habit = Habit.objects.get(id=habit_id)
+    except:
+        context['error_mesg'] = ("Sorry, but habit #" + str(habit_id) + 
+            " was not found in the database.")
+        return render(request, 'habits/error.html', context)
+    if habit.user != request.user:
+        context['error_mesg'] = ("Sorry, but habit #" + str(habit_id) + "is not your habit, "
+            "so you do not have permission to view it.")
+        return render(request, 'habits/error.html', context)
+        
+    context['habit'] = habit
+    #habit, 
+    return render(request, 'habits/detail.html', context)
+
+    

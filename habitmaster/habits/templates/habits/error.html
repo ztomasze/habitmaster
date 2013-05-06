@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block subtitle %} - Error{% endblock %}
+{% block content %}
+
+<div class="row">
+<div class="offset1 span10 widget">
+<p class="text-error">{{ error_mesg }}</p>
+</div>
+
+{% endblock %}

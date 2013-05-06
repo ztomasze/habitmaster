@@ -5,19 +5,20 @@ import datetime
 
 # useful streak-processing functions
     
-def daysInStreak(self, streak, toToday=False):
+def daysInStreak(streak, until=None):
     """ 
     Returns the number of days covered by the activities recorded in this streak.  
     This is a min of 1 day, unless the streak is empty.
     
-    If toToday, this is the number of days from the date of the first activity to today.
+    If until is None, looks only at the streak data itself.  If until is set, uses that
+    as today's date.
     """
     if not streak:
         return 0
-    if toToday:
-        return (datetime.date.today() - streak[0].date).days + 1
+    if until:
+        return (until - streak[0].date).days + 1
     else:
-        return (streak[-1].date - streak[0]).days + 1
+        return (streak[-1].date - streak[0].date).days + 1
 
 
 class Schedule(models.Model):
@@ -77,8 +78,7 @@ class DaysOfWeekSchedule(Schedule):
         return names
     
     def __unicode__(self):
-        return "/".join(self.asNames())
-        
+        return "/".join(self.asNames())        
 
     def iterFromDate(self, date):
         """
@@ -206,13 +206,55 @@ class Habit(models.Model):
     """ 
     The habit to establish, which consists of a task repeated on the given schedule. 
     """
+    
+    # the possible "stars" level of a habit
+    STAR_LEVELS = ("Pending", "Bronze", "Silver", "Gold")
+    
     user = models.ForeignKey(User)
     task = models.CharField(max_length=200)
     schedule = models.ForeignKey(Schedule)
     created = models.DateField(auto_now_add=True)
+    active = models.BooleanField(default=False)
     
+    def __unicode__(self):
+        return self.task
+
     def getActivities(self, missed=False):
         return Activity.objects.filter(habit=self).order_by('date')
+        
+    def getStarLevel(self, today=None):
+        """ 
+        Returns the appropriate value from STAR_LEVELS for this habit. 
+        Can override what today's date is
+        """
+        if not today:
+            today = datetime.date.today()
+        
+        if not self.active:
+            return Habit.STAR_LEVELS[0]
+        streaks = self.schedule.getStreaks(self.getActivities(), today);
+        if not streaks:
+            return Habit.STAR_LEVELS[1]
+        
+        # consider most recent streak, but also the one before that
+        recentDays = daysInStreak(streaks[-1], until=today)
+        pastDays = 0
+        if len(streaks) > 1:
+            pastDays = daysInStreak(streaks[-2], until=None)
+
+        if recentDays > 28:
+            return Habit.STAR_LEVELS[3]  # gold
+        elif recentDays > 14:
+            if pastDays > 28:
+                return Habit.STAR_LEVELS[3]  # returned to gold from silver
+            else:
+                return Habit.STAR_LEVELS[2]  # just silver
+        else:
+            if pastDays > 28:
+                return Habit.STAR_LEVELS[2]  # silver because of recent gold lapse
+            else:
+                return Habit.STAR_LEVELS[1]  # bronze
+                         
     
     def getTotalTimes(self):
         """ Returns the number of completed activities for this habit. """
@@ -222,8 +264,6 @@ class Habit(models.Model):
     def getTotalDays(self):
         return (datetime.date.today() - self.getActivities()[0].date).days
     
-    def __unicode__(self):
-        return self.task
   
 
   
