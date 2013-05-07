@@ -3,11 +3,12 @@
 {% block subtitle %} - New habit{% endblock %}
 {% block content %}
 
-<div class="row">
-<form action="{% url 'habits_create' %}" method="post" class="offset1 span10 habit">
+<div class="row-fluid">
+<div class="widget offset1 span10">
+<h2>Create a New Habit</h2>
+<form action="{% url 'habits_create' %}" method="post" class="habit">
 {% csrf_token %}
 <fieldset>
-<legend>New Habit</legend>
 {% if create_error %}<p class="text-error">Error: {{ create_error }}</p>{% endif %}
 <div class="line">
     <label>Task To Do</label>
@@ -28,11 +29,11 @@
         <td class="day">Sa
         <td class="day">Su
     <tr class="top">
-        <td><input class="checkbox" type="checkbox" name="Mo" value="on">
-        <td><input class="checkbox" type="checkbox" name="Tu">
-        <td><input class="checkbox" type="checkbox" name="We">
-        <td><input class="checkbox" type="checkbox" name="Th">
-        <td><input class="checkbox" type="checkbox" name="Fr" value="on">
+        <td><input class="checkbox" type="checkbox" name="Mo" checked>
+        <td><input class="checkbox" type="checkbox" name="Tu" checked>
+        <td><input class="checkbox" type="checkbox" name="We" checked>
+        <td><input class="checkbox" type="checkbox" name="Th" checked>
+        <td><input class="checkbox" type="checkbox" name="Fr" checked>
         <td><input class="checkbox" type="checkbox" name="Sa">
         <td><input class="checkbox" type="checkbox" name="Su">
     <tr>
@@ -56,6 +57,7 @@
 </div> 
 </fieldset>
 </form>
+</div>
 </div>
 
 {% endblock %}

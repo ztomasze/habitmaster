@@ -81,7 +81,12 @@ def detail(request, habit_id):
         return render(request, 'habits/error.html', context)
         
     context['habit'] = habit
-    #habit, 
+    context['status'] = habit.getStarLevel()
+#    streaks = habit.getStreaks()
+        
+
+    context['activities'] = habit.getActivities()
+    
     return render(request, 'habits/detail.html', context)
 
     

@@ -1,16 +1,88 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block subtitle %} - {{ habit.task }}{% endblock %}
 {% block content %}
 
-<div class="row">
-<form class="widget offset1 span10">
-<fieldset>
-<legend>Habit: {{ habit.task }}</legend>
+<div class="row-fluid">
+<div class="widget offset1 span10">
+<h2>Habit: {{ habit.task }}</h2>
+<div class="detail">
+<!-- Would have been nice to co-opt TABLE's TH and TD here... -->
+<div class="row-fluid">
+    <div class="span6 entry">
+        <b class="key">Status</b>
+        <span class="value">
+        <span class="pending star">&#9734;</span>
+        <span class="bronze star">&#9733;</span>
+        <span class="silver star">&#9733;</span>
+        <span class="gold star">&#9733;</span>
+        {{ habit.getStarLevel }}</span>
+    </div>
+    <div class="span6 entry">
+        <b class="key">Started</b>
+        <span class="value">{{ habit.getStartDate }}</span>
+    </div>
+</div>
 
-</fieldset>
-</form>
+<div class="row-fluid">
+    <div class="span6 entry">
+        <b class="key">Current Streak</b>
+        <span class="value">8 times / 17 days</span>
+    </div>
+    <div class="span6 entry">
+        <b class="key">1UPs</b>
+        <span class="value">0</span>
+    </div>
+</div>
 
+
+<div class="row-fluid">
+    <div class="span12 entry block">
+        <b class="key">Accomplishments</b>
+        <div class="value">None yet. <i>(Not implemented)</i></span>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span12 entry block">
+        <b class="key">Next Up</b>
+        <div class="value">None yet. <i>(Not implemented)</i></span>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span6 entry">
+        <b class="key">Total Times</b>
+        <span class="value">habit.total_times</span>
+    </div>
+    <div class="span6 entry">
+        <b class="key">Total Days</b>
+        <span class="value">habit.total_days</span>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span12 entry">
+        <b class="key">Longest Streak</b>
+        <span class="value">habit.total_times</span>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span12 entry block">
+        <b class="key">History</b>
+        <div class="value">list of activities</span>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span12 entry">
+        <b class="key">Created</b>
+        <span class="value">{{ habit.created.isoformat }}</span>
+    </div>
+</div>
+
+</div>
 </div>
 
 {% endblock %}

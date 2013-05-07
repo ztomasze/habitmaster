@@ -18,12 +18,54 @@ H1.page-title {
     padding: 0.2em;
 }
 
-.widget {
-    margin-top: 1em;
+.widget {  /* the inset block-level white box that most content appears in */
+    margin: 1em 0em;
     padding: 1em;
     border: 1px solid gray;
     background-color: #fff;
 }
+.widget H2 {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 20px;
+  font-size: 21px;
+  font-weight: normal;
+  line-height: 32px;
+  color: #333333;
+  border: 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+.star {
+  font-size: 22px;
+}
+.pending { color: #666; }
+.bronze { color: #ab6c3f;}
+.silver { color: #a3a3ca;}
+.gold { color: #f7cc20; }
+
+
+.entry {
+    font-size: 16px;
+    padding: 0.25em 0.5em;
+}
+.entry .key {
+    font-weight: bold;
+}
+.block .key {
+    display: block;
+}
+.entry .key:after {
+    content: ": "
+}
+.entry .value {
+}
+.block .value {
+    margin: 0.25em 0.5em 0.1em;
+}
+
+
 
 FORM {
     padding-top: 0;    
@@ -38,9 +80,6 @@ FORM.login .line LABEL {
 
 FORM.habit { 
    margin-top: 2em;   
-}
-FORM.habit LEGEND {
-    text-align: center;
 }
 FORM.habit LABEL {
     font-weight: bold;   

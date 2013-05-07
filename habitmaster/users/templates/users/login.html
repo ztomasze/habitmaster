@@ -7,12 +7,12 @@
 <div class="span12"><h1 class="page-title">HabitMaster Login</h1></div>
 </div>
 
-<div class="row">
-<div class="span6" id="users_create">
+<div class="row-fluid">
+<div class="widget span6" id="users_create">
+<h2>Create an Account</h2>
 <form action="{% url 'create' %}" method="post" class="login">
 {% csrf_token %}
 <fieldset>
-    <legend>Create an Account</legend>
     {% if create_error %}<p class="text-error">{{ create_error }}</p>{% endif %}
     <div class="line">
         <label>Username</label> 
@@ -38,11 +38,11 @@
 </form>
 </div>
 
-<div class="span6" id="users_login">
+<div class="span6 widget" id="users_login">
+<h2>Existing User</h2>
 <form action="{% url 'login' %}" method="post" class="login">
 {% csrf_token %}
 <fieldset>
-    <legend>Existing User</legend>
     {% if login_error %}<p class="text-error">{{ login_error }}</p>{% endif %}
     <div class="line">
         <label>Username</label>

@@ -134,7 +134,7 @@ class DaysOfWeekSchedule(Schedule):
                 if streak:
                     streaks.append(streak)
                 # but see if we're still valid
-                if today > req:
+                if today > req or not streaks:
                     streaks.append([])  # now on an empty current streak
                 break
                 
@@ -254,8 +254,23 @@ class Habit(models.Model):
                 return Habit.STAR_LEVELS[2]  # silver because of recent gold lapse
             else:
                 return Habit.STAR_LEVELS[1]  # bronze
-                         
     
+#FIXME
+    #def getStartDate(self):
+        #""" 
+        #Returns the date of the first activity for this habit, else None. 
+        #The date is returned regardless of whether the habit is active or not.
+        #"""
+        #if self.getStreaks()[0]:
+            #return streaks[0][0].date
+        #return None
+    
+    #def getStreaks(self):
+        ## streak computation is the most intensive thing we do, so lets just do it once
+        #if not hasattr(self, 'streaks'):
+            #self.streaks = self.schedule.getStreaks(self.getActivities())
+        return self.streaks
+                         
     def getTotalTimes(self):
         """ Returns the number of completed activities for this habit. """
         activities = self.getActivities().exclude(status=Activity.MISSED)
