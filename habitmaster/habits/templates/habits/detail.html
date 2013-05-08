@@ -7,17 +7,17 @@
 <div class="row-fluid">
 <div class="widget offset1 span10">
 <h2>Habit: {{ habit.task }}</h2>
-<div class="detail">
+
 <!-- Would have been nice to co-opt TABLE's TH and TD here... -->
 <div class="row-fluid">
     <div class="span6 entry">
         <b class="key">Status</b>
         <span class="value">
-        <span class="pending star">&#9734;</span>
-        <span class="bronze star">&#9733;</span>
-        <span class="silver star">&#9733;</span>
-        <span class="gold star">&#9733;</span>
-        {{ habit.getStarLevel }}</span>
+            <span class="{{ status.lower }} star">
+            {% if status == 'Pending' %} &#9734; {% else %} &#9733; {% endif %}
+            </span>
+            ({{ status }})
+        </span>
     </div>
     <div class="span6 entry">
         <b class="key">Started</b>
@@ -27,8 +27,20 @@
 
 <div class="row-fluid">
     <div class="span6 entry">
+        <b class="key">Schedule</b>
+        <span class="value">{{ habit.schedule }}</span>
+    </div>
+    <div class="span6 entry">
+        <b class="key">Next Required Day</b>
+        <span class="value"><i>(Not implemented)</i></span>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span6 entry">
         <b class="key">Current Streak</b>
-        <span class="value">8 times / 17 days</span>
+        <span class="value">{{ current_times }} times / 
+                            {{ current_days }} days</span>
     </div>
     <div class="span6 entry">
         <b class="key">1UPs</b>
@@ -40,38 +52,50 @@
 <div class="row-fluid">
     <div class="span12 entry block">
         <b class="key">Accomplishments</b>
-        <div class="value">None yet. <i>(Not implemented)</i></span>
+        <div class="value">None yet. <i>(Not implemented)</i></div>
     </div>
 </div>
 <div class="row-fluid">
     <div class="span12 entry block">
         <b class="key">Next Up</b>
-        <div class="value">None yet. <i>(Not implemented)</i></span>
+        <div class="value">None yet. <i>(Not implemented)</i></div>
     </div>
 </div>
 
 <div class="row-fluid">
     <div class="span6 entry">
         <b class="key">Total Times</b>
-        <span class="value">habit.total_times</span>
+        <span class="value">{{ habit.getTotalTimes }}</span>
     </div>
     <div class="span6 entry">
         <b class="key">Total Days</b>
-        <span class="value">habit.total_days</span>
+        <span class="value">{{ habit.getTotalDays }}</span>
     </div>
 </div>
 
 <div class="row-fluid">
     <div class="span12 entry">
         <b class="key">Longest Streak</b>
-        <span class="value">habit.total_times</span>
+        <span class="value">{{ longest_times }} times / 
+                            {{ longest_days }} days</span>
     </div>
 </div>
 
 <div class="row-fluid">
     <div class="span12 entry block">
         <b class="key">History</b>
-        <div class="value">list of activities</span>
+        <div class="value">
+        {% if activities %}
+        <ul>
+        {% for act in activities %}
+        <li class="activityStatus{{ act.status }}">
+        {{act.date.isoformat }} - {{ act.note }}
+        {% endfor %}
+        </ul>
+        {% else %}
+        No days completed yet.
+        {% endif %}
+        </div>
     </div>
 </div>
 
@@ -80,6 +104,12 @@
         <b class="key">Created</b>
         <span class="value">{{ habit.created.isoformat }}</span>
     </div>
+</div>
+
+<div class="row-fluid">
+    <nav class="span12">
+        <a href="/" class="btn btn-info">OK</a>
+    </nav>
 </div>
 
 </div>

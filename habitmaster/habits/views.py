@@ -8,6 +8,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db import DatabaseError
 from habitmaster.habits.models import DaysOfWeekSchedule, IntervalSchedule, Habit
+from habitmaster.habits.models import daysInStreak
+import datetime
 
 @login_required
 def index(request):
@@ -82,10 +84,14 @@ def detail(request, habit_id):
         
     context['habit'] = habit
     context['status'] = habit.getStarLevel()
-#    streaks = habit.getStreaks()
-        
-
-    context['activities'] = habit.getActivities()
+    streaks = habit.getStreaks()
+    current = streaks[-1]
+    context['current_times'] = len(current)
+    context['current_days'] = daysInStreak(current, until=datetime.date.today())    
+    longest = max(streaks, key=len)    
+    context['longest_times'] = len(longest)
+    context['longest_days'] = daysInStreak(longest, until=datetime.date.today())
+    context['activities'] = habit.getActivities(missed=True)
     
     return render(request, 'habits/detail.html', context)
 

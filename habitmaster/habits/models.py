@@ -31,7 +31,10 @@ class Schedule(models.Model):
     For all methods, a streak is a list of activities that form a valid streak for this
     schedule.  Thus, a list of streaks is a list of lists of activities.  See getStreaks
     method for more.
-    """    
+    """
+    def __unicode__(self):
+        return self.cast().__unicode__()
+    
     def getStreaks(self, activities, today=None):
         """ 
         Given a flat list of activities, returns a list of lists of those activities where
@@ -56,6 +59,26 @@ class Schedule(models.Model):
         """
         return None
     
+    def cast(self):
+        """
+        Because schedule is abstract and connected by a foreign key, you may occasionally
+        get a Schedule back in practice, rather than the specific subclass.  This method
+        will get you the specific instance.
+        """
+        # XXX: Just listed the subtypes explicitly rather than using scalable reflection
+        inst = None
+        if not inst:
+            try:
+                inst = IntervalSchedule.objects.get(schedule_ptr_id=self.id)
+            except IntervalSchedule.DoesNotExist:
+                pass
+        if not inst:
+            try:
+                inst = DaysOfWeekSchedule.objects.get(schedule_ptr_id=self.id)
+            except DaysOfWeekSchedule.DoesNotExist:
+                pass
+        return inst
+        
         
 class DaysOfWeekSchedule(Schedule):
     """
@@ -220,7 +243,10 @@ class Habit(models.Model):
         return self.task
 
     def getActivities(self, missed=False):
-        return Activity.objects.filter(habit=self).order_by('date')
+        activities = Activity.objects.filter(habit=self)
+        if not missed:
+            activities = activities.exclude(status=Activity.MISSED)
+        return activities.order_by('date')
         
     def getStarLevel(self, today=None):
         """ 
@@ -255,29 +281,35 @@ class Habit(models.Model):
             else:
                 return Habit.STAR_LEVELS[1]  # bronze
     
-#FIXME
-    #def getStartDate(self):
-        #""" 
-        #Returns the date of the first activity for this habit, else None. 
-        #The date is returned regardless of whether the habit is active or not.
-        #"""
-        #if self.getStreaks()[0]:
-            #return streaks[0][0].date
-        #return None
+    def getStartDate(self):
+        """ 
+        Returns the date of the first activity for this habit, else None. 
+        The date is returned regardless of whether the habit is active or not.
+        """
+        streaks = self.getStreaks()
+        if streaks[0]:
+            return streaks[0][0].date
+        return None
     
-    #def getStreaks(self):
-        ## streak computation is the most intensive thing we do, so lets just do it once
-        #if not hasattr(self, 'streaks'):
-            #self.streaks = self.schedule.getStreaks(self.getActivities())
+    def getStreaks(self, today=None):
+        # streak computation is the most intensive thing we do, so lets just do it once
+        if not hasattr(self, 'streaks') or today != self.streaks_date:
+            sched = self.schedule.cast()
+            self.streaks = sched.getStreaks(self.getActivities(), today)
+            self.streaks_date = today
         return self.streaks
                          
     def getTotalTimes(self):
         """ Returns the number of completed activities for this habit. """
-        activities = self.getActivities().exclude(status=Activity.MISSED)
-        return activities.count()
+        return self.getActivities().count()
         
-    def getTotalDays(self):
-        return (datetime.date.today() - self.getActivities()[0].date).days
+    def getTotalDays(self, today=None):
+        if not today:
+            today = datetime.date.today()
+        activities = self.getActivities()
+        if not activities:
+            return 0
+        return (today - self.getActivities()[0].date).days
     
   
 

@@ -86,7 +86,14 @@ class HabitTest(TestCase):
     def test_getTotalDays(self):
         self.assertEqual((datetime.date.today() - datetime.date(2013, 5, 6)).days, 
                          self.habitDays.getTotalDays())
-
+                         
+    def test_getStreaks(self):
+        # works in Python, but not under live Django
+        activities = Activity.objects.all().order_by('date')        
+        streaks = self.mwf.getStreaks(activities, today=datetime.date(2013, 5, 25))
+        self.assertEqual(streaks, self.habitDays.getStreaks(today=datetime.date(2013, 5, 25)))
+        self.assertEqual([[]], self.habitInterval.getStreaks(today=datetime.date(2013, 5, 25)))
+        
     def test_getStreaks_Interval(self):
         activities = Activity.objects.all().order_by('date')
 
@@ -134,4 +141,10 @@ class HabitTest(TestCase):
         self.assertEqual(Habit.STAR_LEVELS[1], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 28)))
         self.assertEqual(Habit.STAR_LEVELS[2], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 29)))
         self.assertEqual(Habit.STAR_LEVELS[1], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 30)))
+        
+    def test_unicode(self):
+        self.assertEqual("Mo/We/Fr", self.mwf.__unicode__())
+        self.assertEqual("Once every 2 days", self.every2.__unicode__())
+        self.assertEqual("Mo/We/Fr", self.habitDays.schedule.__unicode__())
+        
         
