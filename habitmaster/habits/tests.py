@@ -158,9 +158,7 @@ class HabitTest(TestCase):
         # extra days don't make a different to streak start date
         Activity.objects.create(habit=self.habitDays, date=datetime.date(2013, 5, 25))
         activities = Activity.objects.all().order_by('date')
-        print "ACTS:", activities
         streaks = self.every2.getStreaks(activities, today=testday)
-        print "STREAKS:", streaks
         self.assertEqual(datetime.date(2013, 5, 26), 
                          self.every2.nextRequiredDay(streaks[-1], today=testday))         
 
@@ -168,7 +166,11 @@ class HabitTest(TestCase):
         testday = datetime.date(2013, 5, 24)
         streaks = self.habitDays.getStreaks(today=testday)
         self.assertEqual(datetime.date(2013, 5, 27), 
-                         self.mwf.nextRequiredDay(streaks[-1], today=testday)) 
+                         self.mwf.nextRequiredDay(streaks[-1], today=datetime.date(2013, 5, 24))) 
+        self.assertEqual(datetime.date(2013, 5, 27), 
+                         self.mwf.nextRequiredDay(streaks[-1], today=datetime.date(2013, 5, 27))) 
+        self.assertEqual(datetime.date(2013, 5, 29), 
+                         self.mwf.nextRequiredDay(streaks[-1], today=datetime.date(2013, 5, 28))) 
 
                          
     def test_unicode(self):

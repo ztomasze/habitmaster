@@ -33,7 +33,11 @@ class Schedule(models.Model):
     method for more.
     """
     def __unicode__(self):
-        return self.cast().__unicode__()
+        inst = self.cast()
+        if inst:
+            return inst.__unicode__()
+        else:
+            return 'Schedule'
     
     def getStreaks(self, activities, today=None):
         """ 
@@ -47,7 +51,8 @@ class Schedule(models.Model):
         
         ABSTRACT: Must be overridden. Currently returns an empty list (no streaks at all).  
         """
-        return []
+        inst = self.cast()
+        return inst.getStreaks(activities, today) if inst else []
 
     def nextRequiredDay(self, streak, today=None):
         """ 
@@ -61,14 +66,15 @@ class Schedule(models.Model):
         
         ABSTRACT: Must be overridden. Currently returns None.
         """
-        return None
+        inst = self.cast()
+        return inst.nextRequiredDay(streak, today) if inst else None
     
     def cast(self):
         """
         Because schedule is abstract and connected by a foreign key, you may occasionally
         get a Schedule back in practice, rather than the specific subclass.  This method
-        will get you the specific instance.  Use this before calling any of the ABSTRACT
-        Schedule methods on on a Schedule object.
+        is used internally by all of the ABSTRACT methods to allow for DB-backed polymorphism.
+        Its code will need to be updated if you extend Schedule in a new subclass.
         """
         # XXX: Just listed the subtypes explicitly rather than using scalable reflection
         inst = None
@@ -181,10 +187,20 @@ class DaysOfWeekSchedule(Schedule):
     def nextRequiredDay(self, streak, today=None):
         if not today:
             today = datetime.date.today()
-        # regardless of current streak state, next day is the same according to schedule
+        # regardless of current streak state, next day is the same according to schedule,
+        # so can just compute based on today
         reqDays = self.iterFromDate(today)
-        return reqDays.next()
-        
+        todo = reqDays.next()
+        if not streak:
+            return todo
+        else:
+            assert today >= streak[-1].date
+            if streak[-1].date == todo:
+                # already did the required task for today
+                return reqDays.next()
+            else:
+                return todo 
+           
         
 class IntervalSchedule(Schedule):
     """
@@ -205,24 +221,29 @@ class IntervalSchedule(Schedule):
         streaks = []
         streak = []
         startDate = None
+        nextDate = None
+        intervalDays = datetime.timedelta(days=self.interval)
         for act in activities:
             if not startDate:
-                # starting a new streak
-                startDate = act.date
+                # starting first streak
+                startDate = act.date                
+                nextDate = startDate + intervalDays
                 streak.append(act)
             else:
-                if (act.date - startDate).days % self.interval == 0:
+                if act.date == nextDate:
                     # on the correct day
                     streak.append(act)
+                    nextDate += intervalDays
+                
+                elif act.date > nextDate:
+                    # current streak lapsed and so this is start of a new one
+                    streaks.append(streak)
+                    streak = [act]
+                    startDate = act.date
+                    nextDate = startDate + intervalDays
                 else:
-                    if (act.date - startDate).days > self.interval:
-                        # current streak lapsed and this is start of a new one
-                        streaks.append(streak)
-                        streak = [act]
-                        startDate = act.date
-                    else:
-                        # wrong date, but might yet be another on the required day
-                        streak.append(act)
+                    # too early, but there might yet be another on the required day
+                    streak.append(act)
 
         streaks.append(streak)  #add last streak (may be empty)
         
@@ -234,18 +255,15 @@ class IntervalSchedule(Schedule):
                 streaks.append([])  # now on an empty current streak
         
         return streaks
-#FIXME        
+
     def nextRequiredDay(self, streak, today=None):
         """ Any day will work as a valid start day of a new streak. """
         if not today:
             today = datetime.date.today()
         if not streak:
             return today
-        print streak
         span = streak[-1].date - streak[0].date
-        print "Span:", span.days
         extraDays = span.days % self.interval
-        print "Extra:", extraDays
         tilReq = self.interval - extraDays
         return streak[-1].date + datetime.timedelta(days=tilReq)
         
@@ -352,7 +370,9 @@ class Habit(models.Model):
             return 0
         return (today - self.getActivities()[0].date).days
     
-  
+    def nextRequiredDay(self, today=None):
+        streak = self.getStreaks(today)[-1]
+        return self.schedule.nextRequiredDay(streak, today)
 
   
 # The name of this class was something of challenge.  Names considered:
