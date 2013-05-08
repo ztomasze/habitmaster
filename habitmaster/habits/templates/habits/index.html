@@ -3,10 +3,37 @@
 {% block subtitle %} - Habits{% endblock %}
 {% block content %}
 
-<p>
-Welcome, {{ user }}!  (<a href="/logout/">logout</a>)
 
-<p>
-your habits: {{ habits }}
+<div class="userbar">
+    <h4 class="user pull-left">{{ user }}</h4>
+    <div class="pull-right"><a href="{% url 'logout' %}" class="btn-small btn-info">logout</a></div>
+</div>
+
+<div class="row-fluid">
+<div class="widget offset1 span10">
+<h2>Habits</h2>
+{% for habit in habits %}
+<div class="row-fluid">
+    <div class="habit">
+    <div class="span5">
+        <span class="status {{ habit.getStarLevel.lower }} star">
+            {% if habit.getStarLevel == 'Pending' %} &#9734; {% else %} &#9733; {% endif %}
+        </span>
+        <span class="task"><a href="{% url 'habit' habit_id=habit.id %}">{{habit.task}}</a></span>
+    </div>
+    <div class="span7">
+        <span class="schedule">{{ habit.schedule }}</span>
+        <span class="streak">{{ habit.getCurrentStreakTimes }} times / 
+                            {{ habit.getCurrentStreakDays }} days</span>
+        <span class="checkbox">
+        <button class="btn btn-inverse btn-small">Did This</button>
+        </span>
+    </div>
+    <div class="bottom-ruler"></div>
+    </div>
+</div>
+{% endfor %}
+</div>
+</div>
 
 {% endblock %}

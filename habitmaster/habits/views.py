@@ -85,9 +85,7 @@ def detail(request, habit_id):
     context['habit'] = habit
     context['status'] = habit.getStarLevel()
     streaks = habit.getStreaks()
-    current = streaks[-1]
-    context['current_times'] = len(current)
-    context['current_days'] = daysInStreak(current, until=datetime.date.today())    
+  
     longest = max(streaks, key=len)    
     context['longest_times'] = len(longest)
     context['longest_days'] = daysInStreak(longest, until=datetime.date.today())

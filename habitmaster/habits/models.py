@@ -49,11 +49,15 @@ class Schedule(models.Model):
         """
         return []
 
-    def nextRequired(self, date, floor=True):
+    def nextRequiredDay(self, streak, today=None):
         """ 
-        Given a date, what is the date of the next required activity?
-        If floor=True, will return the soonest possible date, even if that is the
-        date given.  Otherwise, finds the first requirement after the given date.
+        Given a streak of activities, what is the date of the next required activity?
+        A streak is required because for some schedules, the first activity determines the
+        required cycle.  There may be extra activities on non-required days.  Some schedules
+        may also need to know what today is.  For example an empty interval streak should
+        start today!  (Though if not, tomorrow will work too.)  Also, if today falls on a 
+        DaysOfWeekSchedule, whether or not it is required will depend on whether it is
+        already the last day in the streak.
         
         ABSTRACT: Must be overridden. Currently returns None.
         """
@@ -63,7 +67,8 @@ class Schedule(models.Model):
         """
         Because schedule is abstract and connected by a foreign key, you may occasionally
         get a Schedule back in practice, rather than the specific subclass.  This method
-        will get you the specific instance.
+        will get you the specific instance.  Use this before calling any of the ABSTRACT
+        Schedule methods on on a Schedule object.
         """
         # XXX: Just listed the subtypes explicitly rather than using scalable reflection
         inst = None
@@ -173,6 +178,13 @@ class DaysOfWeekSchedule(Schedule):
                 
         return streaks
             
+    def nextRequiredDay(self, streak, today=None):
+        if not today:
+            today = datetime.date.today()
+        # regardless of current streak state, next day is the same according to schedule
+        reqDays = self.iterFromDate(today)
+        return reqDays.next()
+        
         
 class IntervalSchedule(Schedule):
     """
@@ -222,8 +234,21 @@ class IntervalSchedule(Schedule):
                 streaks.append([])  # now on an empty current streak
         
         return streaks
+#FIXME        
+    def nextRequiredDay(self, streak, today=None):
+        """ Any day will work as a valid start day of a new streak. """
+        if not today:
+            today = datetime.date.today()
+        if not streak:
+            return today
+        print streak
+        span = streak[-1].date - streak[0].date
+        print "Span:", span.days
+        extraDays = span.days % self.interval
+        print "Extra:", extraDays
+        tilReq = self.interval - extraDays
+        return streak[-1].date + datetime.timedelta(days=tilReq)
         
-
         
 class Habit(models.Model):
     """ 
@@ -247,7 +272,23 @@ class Habit(models.Model):
         if not missed:
             activities = activities.exclude(status=Activity.MISSED)
         return activities.order_by('date')
-        
+    
+    def getCurrentStreakDays(self, today=None):
+        """ Returns the number of days in the most recent streak, from first activity until today. """
+        streaks = self.getStreaks(today);
+        if not streaks:
+            return 0
+        if not today:
+            today=datetime.date.today()
+        return daysInStreak(streaks[-1], until=today)  
+
+    def getCurrentStreakTimes(self, today=None):
+        """ Returns the number of activities in the most recent streak. """
+        streaks = self.getStreaks(today);
+        if not streaks:
+            return 0
+        return len(streaks[-1])        
+
     def getStarLevel(self, today=None):
         """ 
         Returns the appropriate value from STAR_LEVELS for this habit. 

@@ -59,10 +59,11 @@ class IntervalScheduleTest(TestCase):
 
     def test_unicode(self):
         self.assertEqual(self.every3.__unicode__(), 'Once every 3 days')
-        
-        
+                
         
 class HabitTest(TestCase):
+    """ Includes a lof schedule testing too, since share the same test structure. """
+    
     def setUp(self):
         self.mwf = DaysOfWeekSchedule.objects.create(days='1010100')
         self.weekdays = DaysOfWeekSchedule.objects.create(days='1111100')
@@ -141,7 +142,35 @@ class HabitTest(TestCase):
         self.assertEqual(Habit.STAR_LEVELS[1], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 28)))
         self.assertEqual(Habit.STAR_LEVELS[2], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 29)))
         self.assertEqual(Habit.STAR_LEVELS[1], self.habitDays.getStarLevel(today=datetime.date(2013, 5, 30)))
-        
+    
+    def test_nextRequiredDay_Interval(self):
+        testday = datetime.date(2013, 5, 25)
+        activities = Activity.objects.all().order_by('date')
+        streaks = self.every2.getStreaks(activities, today=testday)
+        self.assertEqual(datetime.date(2013, 5, 26), 
+                         self.every2.nextRequiredDay(streaks[-1], today=testday)) 
+        self.assertEqual(datetime.date(2013, 5, 29), 
+                         self.every2.nextRequiredDay([], today=datetime.date(2013, 5, 29))) 
+        streaks = self.every2.getStreaks(activities, today=datetime.date(2013, 5, 30))
+        self.assertEqual(datetime.date(2013, 5, 30), 
+                         self.every2.nextRequiredDay([], today=datetime.date(2013, 5, 30)))
+
+        # extra days don't make a different to streak start date
+        Activity.objects.create(habit=self.habitDays, date=datetime.date(2013, 5, 25))
+        activities = Activity.objects.all().order_by('date')
+        print "ACTS:", activities
+        streaks = self.every2.getStreaks(activities, today=testday)
+        print "STREAKS:", streaks
+        self.assertEqual(datetime.date(2013, 5, 26), 
+                         self.every2.nextRequiredDay(streaks[-1], today=testday))         
+
+    def test_nextRequiredDay_DaysOfWeek(self):
+        testday = datetime.date(2013, 5, 24)
+        streaks = self.habitDays.getStreaks(today=testday)
+        self.assertEqual(datetime.date(2013, 5, 27), 
+                         self.mwf.nextRequiredDay(streaks[-1], today=testday)) 
+
+                         
     def test_unicode(self):
         self.assertEqual("Mo/We/Fr", self.mwf.__unicode__())
         self.assertEqual("Once every 2 days", self.every2.__unicode__())

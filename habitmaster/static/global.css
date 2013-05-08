@@ -13,6 +13,17 @@ H1.page-title {
     font-size: 24.5px;  /* boostrap H1 small or H3 size */
 }
 
+.userbar {
+   padding: 0.5em 0 24px;
+}
+.userbar H4 {
+   margin: 0;
+   padding: 0;
+   font-size: 16px;
+   line-height: 20px;
+}
+
+
 .error {
     border: 2px solid red;
     padding: 0.2em;
@@ -45,6 +56,18 @@ H1.page-title {
 .silver { color: #a3a3ca;}
 .gold { color: #f7cc20; }
 
+.activityStatus0 {
+    color: #900;
+}
+.activityStatus10 {
+    color: #030;
+}
+.activityStatus5 {
+    color: #030;
+}
+.activityStatus15 {
+    color: #090;
+}
 
 .entry {
     font-size: 16px;
@@ -65,18 +88,50 @@ H1.page-title {
     margin: 0.25em 0.5em 0.1em;
 }
 
-.activityStatus0 {
-    color: #900;
+DIV.habit {
+    border: 1px solid black;
+    padding: 0.5em;
+    border-radius: 8px;
 }
-.activityStatus10 {
-    color: #030;
+
+DIV.habit SPAN {
+   display: inline-block;
+   margin-top: 4px;
 }
-.activityStatus5 {
-    color: #030;
+DIV.habit .status {
+    width: 1.5em;
+    text-align: center;
 }
-.activityStatus15 {
-    color: #090;
+DIV.habit .task {
+    font-weight: bold;
 }
+DIV.habit .task A {
+    color: #003;
+    text-decoration: none;
+}
+DIV.habit .task A:hover {
+    text-decoration: underline;
+}
+
+DIV.habit .schedule {
+    min-width: 30%;
+    padding-left: 1em;
+}
+DIV.habit .streak {
+    padding-left: 1em;
+}
+DIV.habit .checkbox {
+    float: right;
+    padding-right: 0.1em;
+}
+DIV.habit DIV.bottom-ruler {
+    clear: both;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+}
+
+
 
 NAV {
   margin: 1em auto 0.5em;
@@ -102,31 +157,31 @@ FORM.habit LABEL {
     font-weight: bold;   
 }
 
-FORM.habit #new_habit {
+#new_habit {
     border: 1px dotted #999;
 }
 
-FORM.habit #new_habit TD {
+#new_habit TD {
     width: 2em;
     text-align: center;
     vertical-align: middle;
     border-top: 1px dotted #999;
 }
-FORM.habit #new_habit TR.top TD {
+#new_habit TR.top TD {
     border-top: 0;
 }
-FORM.habit #new_habit TD.description {
+#new_habit TD.description {
     width: 18ex;
     text-align: left;
     padding-left: 1em;
 }
-FORM.habit #new_habit TD.day {
+#new_habit TD.day {
     vertical-align: bottom;   
 }
-FORM.habit #new_habit TD.checkbox {
+#new_habit TD.checkbox {
     vertical-align: top;   
 }
-FORM.habit #new_habit TD.selector {
+#new_habit TD.selector {
     border: 1px dotted #999;   
 }
 FORM.habit SELECT {

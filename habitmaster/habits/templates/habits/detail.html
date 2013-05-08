@@ -39,8 +39,8 @@
 <div class="row-fluid">
     <div class="span6 entry">
         <b class="key">Current Streak</b>
-        <span class="value">{{ current_times }} times / 
-                            {{ current_days }} days</span>
+        <span class="value">{{ habit.getCurrentStreakTimes }} times / 
+                            {{ habit.getCurrentStreakDays }} days</span>
     </div>
     <div class="span6 entry">
         <b class="key">1UPs</b>
@@ -108,7 +108,7 @@
 
 <div class="row-fluid">
     <nav class="span12">
-        <a href="/" class="btn btn-info">OK</a>
+        <a href="{% url 'index' %}" class="btn btn-info">OK</a>
     </nav>
 </div>
 
