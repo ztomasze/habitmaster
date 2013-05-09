@@ -209,7 +209,10 @@ class IntervalSchedule(Schedule):
     interval = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(7)])
 
     def __unicode__(self):
-        return 'Once every ' + str(self.interval) + ' days'
+        if self.interval == 1:
+            return 'Every day'
+        else:
+            return 'Every ' + str(self.interval) + ' days'
 
         
     def getStreaks(self, activities, today=None):
@@ -284,6 +287,17 @@ class Habit(models.Model):
     
     def __unicode__(self):
         return self.task
+        
+    def activeToday(self, today=None, missed=False):
+        """ Returns whether an activity occurred today. """
+        activities = self.getActivities(missed)
+        if not activities:
+            return False
+        if not today:
+            today = datetime.date.today()
+        last = activities[len(activities) - 1]
+        return last.date == today
+         
 
     def getActivities(self, missed=False):
         activities = Activity.objects.filter(habit=self)

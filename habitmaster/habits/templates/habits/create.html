@@ -38,7 +38,7 @@
         <td><input class="checkbox" type="checkbox" name="Su">
     <tr>
         <td class="selector"><input type="radio" name="schedule" value="fixed"> 
-        <td class="description">Once every 
+        <td class="description">Every 
         <td colspan="7">
             <select name="interval">
             <option value="1" selected>1 day</option>
@@ -52,7 +52,9 @@
     </table>
 <div class="line">
     <label></label>
-    <button type="submit" class="btn btn-primary">Create</button>
+    <button type="submit" class="button btn btn-primary">Create</button>
+    <a href="{% url 'index' %}" class="button btn">Cancel</a>
+</div>
 </div>
 </div> 
 </fieldset>

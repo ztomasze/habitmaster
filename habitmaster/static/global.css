@@ -21,6 +21,7 @@ H1.page-title {
    padding: 0;
    font-size: 16px;
    line-height: 20px;
+   color: #333;
 }
 
 
@@ -89,9 +90,11 @@ H1.page-title {
 }
 
 DIV.habit {
-    border: 1px solid black;
+    background-color: #fafaff;
+    border: 1px solid #003;
     padding: 0.5em;
     border-radius: 8px;
+    margin: 0 0 10px;
 }
 
 DIV.habit SPAN {
@@ -138,8 +141,12 @@ NAV {
   text-align: center;
 }
 
+FORM.didit {
+  margin: 0;
+  padding: 0;
+}
 
-FORM {
+FORM.login {
     padding-top: 0;    
 }
 FORM.login .line LABEL {
@@ -188,7 +195,7 @@ FORM.habit SELECT {
     margin: 0.5em 0em;
     width: auto:
 }
-FORM.habit BUTTON {
-    margin: 1em auto 0.5em;
+FORM.habit .button {
+    margin: 1em 0.5em 0.5em;
 }
 

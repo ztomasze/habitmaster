@@ -22,17 +22,37 @@
         <span class="task"><a href="{% url 'habit' habit_id=habit.id %}">{{habit.task}}</a></span>
     </div>
     <div class="span7">
+        <form action="{% url 'activity_create' %}" method="POST" class="didit">
+        {% csrf_token %}
+        <input type="hidden" name="habit" value="{{ habit.id }}">
         <span class="schedule">{{ habit.schedule }}</span>
         <span class="streak">{{ habit.getCurrentStreakTimes }} times / 
-                            {{ habit.getCurrentStreakDays }} days</span>
+                            {{ habit.getCurrentStreakDays }} days</span>        
         <span class="checkbox">
-        <button class="btn btn-inverse btn-small">Did This</button>
+        <button type="submit" class="btn btn-small 
+        {% if habit.getRequiredDay == today %}
+            {% if habit.activeToday %}
+            btn-success
+            {% else %}
+            btn-danger
+            {% endif %}
+        {% endif %}
+        ">Did This</button>
         </span>
+        </form>
     </div>
     <div class="bottom-ruler"></div>
     </div>
 </div>
 {% endfor %}
+
+<div class="row-fluid">
+<div class="row-fluid">
+    <nav class="span12">
+        <a href="{% url 'habits_create' %}" class="btn btn-small">New Habit</a>
+    </nav>
+</div>
+
 </div>
 </div>
 

@@ -3,11 +3,11 @@ Habits, creation, index overview, and details of a single habit.
 """
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db import DatabaseError
-from habitmaster.habits.models import DaysOfWeekSchedule, IntervalSchedule, Habit
+from habitmaster.habits.models import DaysOfWeekSchedule, IntervalSchedule, Habit, Activity
 from habitmaster.habits.models import daysInStreak
 import datetime
 
@@ -56,6 +56,8 @@ def create(request):
             try:
                 schedule.save()
                 habit = Habit(user=request.user, task=request.POST['task'], schedule=schedule)
+                # XXX: For now... design suggests that we should start with pending
+                habit.active = True
                 habit.save()
                 return HttpResponseRedirect(reverse('index'))
             except DatabaseError as e:
@@ -93,4 +95,39 @@ def detail(request, habit_id):
     
     return render(request, 'habits/detail.html', context)
 
+
+@login_required
+def activity_create(request):
+    context = {}
+    if request.method == 'POST':
+        try:
+            habit = Habit.objects.get(id=request.POST['habit'])
+        except:
+            context['error_mesg'] = ("Sorry, but either habit id was not given or "
+                " was not found in the database.")
+            return render(request, 'habits/error.html', context)
+        if habit.user != request.user:
+            context['error_mesg'] = ("Sorry, but habit #" + str(habit_id) + "is not your habit, "
+                "so you do not have permission to view or modify it.")
+            return render(request, 'habits/error.html', context)
+        
+        acts = Activity.objects.filter(habit=habit, date=datetime.date.today())
+        if acts:
+            context['error_mesg'] = "An activity with today's date already exists: " + str(acts[0])
+        else:        
+            try:
+                act = Activity.objects.create(date=datetime.date.today(), habit=habit)
+                act.save()
+                return HttpResponseRedirect(reverse('index'))
+            except DatabaseError as e:
+                context['error_mesg'] = "Could not create new activity: " + str(e)        
     
+    else:
+        # FIXME: replace with form
+        context['error_mesg'] = "Not a POST request."
+        
+    if 'error_mesg' in context:
+        return render(request, 'habits/error.html', context)
+    
+    return render(request, 'habits/index.html', context)
+        

@@ -14,6 +14,8 @@ urlpatterns = patterns('',
 
     url(r'^habit/new/$', 'habitmaster.habits.views.create', name='habits_create'),
     url(r'^habit/(?P<habit_id>\d+)/$', 'habitmaster.habits.views.detail', name='habit'),
+
+    url(r'^activity/new/$', 'habitmaster.habits.views.activity_create', name='activity_create'),
     
     url(r'^create/$', 'habitmaster.users.views.create', name='create'),
     url(r'^login/$', 'habitmaster.users.views.login', name='login'),
