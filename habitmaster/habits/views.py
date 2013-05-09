@@ -130,4 +130,3 @@ def activity_create(request):
         return render(request, 'habits/error.html', context)
     
     return render(request, 'habits/index.html', context)
-        
