@@ -30,14 +30,16 @@
                             {{ habit.getCurrentStreakDays }} days</span>        
         <span class="checkbox">
         <button type="submit" class="btn btn-small 
-        {% if habit.getRequiredDay == today %}
+        {% if habit.nextRequiredDay == today %}
             {% if habit.activeToday %}
-            btn-success
+            btn-success">Did This
             {% else %}
-            btn-danger
+            btn-danger">Do This
             {% endif %}
+        {% else %}
+          btn-inverse">Did This
         {% endif %}
-        ">Did This</button>
+        </button>
         </span>
         </form>
     </div>

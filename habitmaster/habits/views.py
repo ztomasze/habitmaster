@@ -16,6 +16,7 @@ def index(request):
     """ Main habit overview page. """
     context = {'user': request.user}
     context['habits'] = Habit.objects.filter(user=request.user)
+    context['today'] = datetime.date.today()
     return render(request, 'habits/index.html', context)
     
 @login_required
