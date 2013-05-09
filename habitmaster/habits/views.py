@@ -91,7 +91,10 @@ def detail(request, habit_id):
   
     longest = max(streaks, key=len)    
     context['longest_times'] = len(longest)
-    context['longest_days'] = daysInStreak(longest, until=datetime.date.today())
+    if longest == streaks[-1]:
+        context['longest_days'] = daysInStreak(longest, until=datetime.date.today())
+    else:
+        context['longest_days'] = daysInStreak(longest)
     context['activities'] = habit.getActivities(missed=True)
     
     return render(request, 'habits/detail.html', context)
