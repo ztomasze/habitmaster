@@ -11,7 +11,9 @@ from django.contrib.auth.models import User
 def create(request):
     context = {}
     try:
-        if not request.POST['password']:
+        if User.objects.filter(username=request.POST['username']):
+            context['create_error'] = "A user named '" + request.POST['username'] + "' already exists."
+        elif not request.POST['password']:
             context['create_error'] = "You must provide a password."  #email "optional"
         elif request.POST['password'] != request.POST['password_again']:
             context['create_error'] = "Your retyped password did not match the original."
